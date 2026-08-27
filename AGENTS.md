@@ -70,8 +70,13 @@ GitHub Pages at `https://sinhaparth5.github.io/vphilox-web`.
 `src/content/paper/vphilox.mdx` is **generated output**. Edits to it are lost. Run:
 
 ```
-./scripts/convert-paper.sh          # docs/vphilox.tex -> src/content/paper/vphilox.mdx
+./scripts/convert-paper.sh          # ../vphilox/paper/vphilox.tex -> src/content/paper/vphilox.mdx
 ```
+
+The `.tex` lives in the sibling `vphilox` repo, not here, so conversion is a **local
+step only** — CI has no source to convert and builds the committed MDX as it stands.
+Regenerate and commit the MDX yourself after a `.tex` change. Pass a path as the first
+argument if the source is somewhere other than `../vphilox/paper/vphilox.tex`.
 
 The pipeline is three parts, and a fix belongs in whichever one owns the problem:
 
@@ -139,9 +144,13 @@ screen at a time and the checker sees only what it is given.
 
 ## Deploying
 
-`.github/workflows/deploy.yml` builds on push to `master` and deploys to Pages. It
-installs pandoc, re-runs the conversion, and **fails if the committed MDX is stale**, so
-commit `src/content/paper/vphilox.mdx` alongside any `.tex` change.
+`.github/workflows/deploy.yml` builds on push to `master` and deploys to Pages:
+`npm ci`, `npm run build`, upload. Nothing else. It used to re-run the paper conversion
+and fail on a stale MDX, but the `.tex` is not in this repo, so the check could only
+ever fail on a clean checkout.
+
+`public/vphilox.pdf` is the download behind the PDF links in the header and on
+`/paper`. It is committed here and updated by hand.
 
 ## Documentation
 
