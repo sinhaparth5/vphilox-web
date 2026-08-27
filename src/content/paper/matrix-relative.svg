@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="890" viewBox="0 0 980 890" font-family="Helvetica, Arial, 'Liberation Sans', sans-serif" font-variant-numeric="tabular-nums" role="img" aria-label="Throughput relative to std::mt19937">
+<title>Throughput relative to std::mt19937</title>
+<rect width="980" height="890" fill="#FFFFFF"/>
+<text x="32" y="28" font-size="17" fill="#16191D" font-weight="600">Cost per byte, relative to std::mt19937 on the same machine</text>
+<text x="32" y="48" font-size="12" fill="#454B54">Lower is faster. Every bar is a ratio measured inside one machine, never a raw cycles/byte: RDTSC counts reference cycles, so the absolute unit does not carry</text>
+<text x="32" y="65" font-size="12" fill="#454B54">across hosts. The dashed rule is std::mt19937 itself.</text>
+<line x1="32" y1="86" x2="948" y2="86" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<rect x="32" y="92.92" width="22" height="10" fill="#0072B2" rx="2"/>
+<text x="61" y="102" font-size="12" fill="#454B54">Pi 5 / NEON</text>
+<rect x="150.35" y="92.92" width="22" height="10" fill="#D55E00" rx="2"/>
+<text x="179.35" y="102" font-size="12" fill="#454B54">Sapphire Rapids</text>
+<rect x="292.06" y="92.92" width="22" height="10" fill="#009E73" rx="2"/>
+<text x="321.06" y="102" font-size="12" fill="#454B54">Skylake-SP</text>
+<rect x="407.07" y="92.92" width="22" height="10" fill="#7B52AB" rx="2"/>
+<text x="436.07" y="102" font-size="12" fill="#454B54">Cascade Lake 4v</text>
+<rect x="552.78" y="92.92" width="22" height="10" fill="#B07A00" rx="2"/>
+<text x="581.78" y="102" font-size="12" fill="#454B54">Cascade Lake 32v</text>
+<line x1="224" y1="134" x2="224" y2="830" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<text x="217.93" y="850" font-size="11.5" fill="#6B7280">0x</text>
+<line x1="395" y1="134" x2="395" y2="830" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<text x="384.13" y="850" font-size="11.5" fill="#6B7280">0.5x</text>
+<line x1="566" y1="134" x2="566" y2="830" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<text x="559.93" y="850" font-size="11.5" fill="#6B7280">1x</text>
+<line x1="737" y1="134" x2="737" y2="830" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<text x="726.13" y="850" font-size="11.5" fill="#6B7280">1.5x</text>
+<line x1="908" y1="134" x2="908" y2="830" stroke="#E6E9ED" stroke-width="1" stroke-linecap="round"/>
+<text x="901.93" y="850" font-size="11.5" fill="#6B7280">2x</text>
+<line x1="224" y1="830" x2="908" y2="830" stroke="#B9BFC7" stroke-width="1.2" stroke-linecap="round"/>
+<text x="379.09" y="870" font-size="12" fill="#454B54">cycles per byte ÷ std::mt19937 on the same machine — lower is faster</text>
+<rect x="32" y="131" width="916" height="106" fill="#F5F7F9" fill-opacity="0.55" rx="3"/>
+<text x="139.29" y="188.32" font-size="12" fill="#454B54">xoshiro256++</text>
+<rect x="224" y="137" width="96.08" height="14" fill="#0072B2" rx="1.5"/>
+<text x="326.08" y="148" font-size="11" fill="#6B7280">0.28x</text>
+<rect x="224" y="157" width="101.57" height="14" fill="#D55E00" rx="1.5"/>
+<text x="331.57" y="168" font-size="11" fill="#6B7280">0.30x</text>
+<rect x="224" y="177" width="82.55" height="14" fill="#009E73" rx="1.5"/>
+<text x="312.55" y="188" font-size="11" fill="#6B7280">0.24x</text>
+<rect x="224" y="197" width="59.25" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="289.25" y="208" font-size="11" fill="#6B7280">0.17x</text>
+<rect x="224" y="217" width="99.52" height="14" fill="#B07A00" rx="1.5"/>
+<text x="329.52" y="228" font-size="11" fill="#6B7280">0.29x</text>
+<rect x="32" y="247" width="916" height="106" fill="#F5F7F9" fill-opacity="0.55" rx="3"/>
+<text x="172.65" y="304.32" font-size="12" fill="#454B54">PCG64</text>
+<rect x="224" y="253" width="285.37" height="14" fill="#0072B2" rx="1.5"/>
+<text x="515.37" y="264" font-size="11" fill="#6B7280">0.83x</text>
+<rect x="224" y="273" width="201.81" height="14" fill="#D55E00" rx="1.5"/>
+<text x="431.81" y="284" font-size="11" fill="#6B7280">0.59x</text>
+<rect x="224" y="293" width="113.4" height="14" fill="#009E73" rx="1.5"/>
+<text x="343.4" y="304" font-size="11" fill="#6B7280">0.33x</text>
+<rect x="224" y="313" width="108.48" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="338.48" y="324" font-size="11" fill="#6B7280">0.32x</text>
+<rect x="224" y="333" width="179.76" height="14" fill="#B07A00" rx="1.5"/>
+<text x="409.76" y="344" font-size="11" fill="#6B7280">0.53x</text>
+<rect x="32" y="363" width="916" height="106" fill="#F5F7F9" fill-opacity="0.55" rx="3"/>
+<text x="142.63" y="420.32" font-size="12" fill="#454B54">std::mt19937</text>
+<rect x="224" y="369" width="342" height="14" fill="#0072B2" rx="1.5"/>
+<text x="572" y="380" font-size="11" fill="#6B7280">1.00x</text>
+<rect x="224" y="389" width="342" height="14" fill="#D55E00" rx="1.5"/>
+<text x="572" y="400" font-size="11" fill="#6B7280">1.00x</text>
+<rect x="224" y="409" width="342" height="14" fill="#009E73" rx="1.5"/>
+<text x="572" y="420" font-size="11" fill="#6B7280">1.00x</text>
+<rect x="224" y="429" width="342" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="572" y="440" font-size="11" fill="#6B7280">1.00x</text>
+<rect x="224" y="449" width="342" height="14" fill="#B07A00" rx="1.5"/>
+<text x="572" y="460" font-size="11" fill="#6B7280">1.00x</text>
+<rect x="32" y="479" width="916" height="106" fill="#F5F7F9" fill-opacity="0.55" rx="3"/>
+<text x="95.3" y="536.32" font-size="12" fill="#454B54">Philox (unspecialised)</text>
+<rect x="224" y="485" width="563.68" height="14" fill="#0072B2" rx="1.5"/>
+<text x="793.68" y="496" font-size="11" fill="#6B7280">1.65x</text>
+<rect x="224" y="505" width="531.44" height="14" fill="#D55E00" rx="1.5"/>
+<text x="761.44" y="516" font-size="11" fill="#6B7280">1.55x</text>
+<rect x="224" y="525" width="391.84" height="14" fill="#009E73" rx="1.5"/>
+<text x="621.84" y="536" font-size="11" fill="#6B7280">1.15x</text>
+<rect x="224" y="545" width="375.08" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="605.08" y="556" font-size="11" fill="#6B7280">1.10x</text>
+<rect x="224" y="565" width="555.46" height="14" fill="#B07A00" rx="1.5"/>
+<text x="785.46" y="576" font-size="11" fill="#6B7280">1.62x</text>
+<rect x="32" y="595" width="916" height="106" fill="#F5F7F9" rx="3"/>
+<rect x="32" y="595" width="3" height="106" fill="#0072B2" fill-opacity="0.55" rx="1.5"/>
+<text x="110.66" y="652.32" font-size="12" fill="#16191D" font-weight="600">vphilox (buffered)</text>
+<rect x="224" y="601" width="393.71" height="14" fill="#0072B2" rx="1.5"/>
+<text x="623.71" y="612" font-size="11" fill="#6B7280">1.15x</text>
+<rect x="224" y="621" width="270.01" height="14" fill="#D55E00" rx="1.5"/>
+<text x="500.01" y="632" font-size="11" fill="#6B7280">0.79x</text>
+<rect x="224" y="641" width="175.11" height="14" fill="#009E73" rx="1.5"/>
+<text x="405.11" y="652" font-size="11" fill="#6B7280">0.51x</text>
+<rect x="224" y="661" width="199.97" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="429.97" y="672" font-size="11" fill="#6B7280">0.58x</text>
+<rect x="224" y="681" width="231.64" height="14" fill="#B07A00" rx="1.5"/>
+<text x="461.64" y="692" font-size="11" fill="#6B7280">0.68x</text>
+<rect x="32" y="711" width="916" height="106" fill="#F5F7F9" rx="3"/>
+<rect x="32" y="711" width="3" height="106" fill="#0072B2" fill-opacity="0.55" rx="1.5"/>
+<text x="94.64" y="768.32" font-size="12" fill="#16191D" font-weight="600">vphilox (generate_n)</text>
+<rect x="224" y="717" width="257.28" height="14" fill="#0072B2" rx="1.5"/>
+<text x="487.28" y="728" font-size="11" fill="#6B7280">0.75x</text>
+<rect x="224" y="737" width="129.45" height="14" fill="#D55E00" rx="1.5"/>
+<text x="359.45" y="748" font-size="11" fill="#6B7280">0.38x</text>
+<rect x="224" y="757" width="73.9" height="14" fill="#009E73" rx="1.5"/>
+<text x="303.9" y="768" font-size="11" fill="#6B7280">0.22x</text>
+<rect x="224" y="777" width="82.78" height="14" fill="#7B52AB" rx="1.5"/>
+<text x="312.78" y="788" font-size="11" fill="#6B7280">0.24x</text>
+<rect x="224" y="797" width="114.25" height="14" fill="#B07A00" rx="1.5"/>
+<text x="344.25" y="808" font-size="11" fill="#6B7280">0.33x</text>
+<line x1="566" y1="134" x2="566" y2="830" stroke="#8A9099" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="5 4"/>
+</svg>

@@ -1,0 +1,14 @@
+/* Entry point. Import order is the cascade order: tokens, then defaults, then
+   structure, then the things that sit inside it. Layers are deliberately not
+   used, since every rule here is first-party and specificity stays flat. */
+
+@import './tokens.css';
+@import './reset.css';
+@import './layout.css';
+@import './chrome.css';
+@import './typography.css';
+@import './figures.css';
+@import './math.css';
+@import './anim.css';
+@import './motion.css';
+@import './print.css';

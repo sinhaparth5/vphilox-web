@@ -1,0 +1,94 @@
+---
+import { Font } from 'astro:assets';
+import { withBase } from '@lib/url';
+import '../styles/index.css';
+import 'katex/dist/katex.min.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'vphilox: portable, seekable random streams for parallel CPU simulation.',
+} = Astro.props;
+
+const here = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (path: string) => {
+  const target = withBase(path).replace(/\/$/, '');
+  return here === target || (path !== '' && here.startsWith(target + '/'));
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <title>{title}</title>
+
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-head" preload />
+    <Font cssVariable="--font-mono" />
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site">
+      <nav>
+        <a class="wordmark" href={withBase('')}>vphilox</a>
+        <span class="nav-links">
+          <a href={withBase('paper')} aria-current={isCurrent('paper') ? 'page' : undefined}>Paper</a>
+          <a href={withBase('docs')} aria-current={isCurrent('docs') ? 'page' : undefined}>Explainers</a>
+          <a href={withBase('vphilox.pdf')}>PDF</a>
+          <a href="https://github.com/sinhaparth5/vphilox">Source</a>
+        </span>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site">
+      <p>
+        Parth Sinha ·
+        <a href="https://orcid.org/0009-0002-3120-9301">ORCID 0009-0002-3120-9301</a> ·
+        MIT or Apache-2.0
+      </p>
+    </footer>
+
+    <script>
+      // Figures and equations fade up as they arrive. Anything already on
+      // screen at load is shown immediately, so nothing sits blank.
+      const targets = document.querySelectorAll<HTMLElement>('main figure, main .equation');
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!reduced && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              e.target.classList.add('is-in');
+              io.unobserve(e.target);
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.06 },
+        );
+        for (const el of targets) {
+          if (el.getBoundingClientRect().top < innerHeight) {
+            el.classList.add('reveal', 'is-in');
+          } else {
+            el.classList.add('reveal');
+            io.observe(el);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

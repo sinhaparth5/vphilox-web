@@ -1,0 +1,30 @@
+---
+import { withBase } from '@lib/url';
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+
+---
+
+<Base title="Explainers — vphilox">
+  <h1>Explainers</h1>
+  <p class="lede">Short pieces that take one mechanism from the paper and draw it.</p>
+  <ul class="doc-list">
+    {docs.map((d) => (
+      <li>
+        <a href={withBase(`docs/${d.id}`)}>{d.data.title}</a>
+        <span>{d.data.description}</span>
+      </li>
+    ))}
+  </ul>
+</Base>
+
+<style>
+  h1 { font-size: var(--step-3); }
+  .lede { color: var(--text-soft); }
+  .doc-list { list-style: none; padding: 0; margin-top: 2rem; display: grid; gap: 1rem; }
+  .doc-list li { display: grid; gap: 0.15rem; }
+  .doc-list a { font-family: var(--font-head), system-ui, sans-serif; font-weight: 600; }
+  .doc-list span { font-size: var(--step--1); color: var(--text-soft); }
+</style>

@@ -1,0 +1,48 @@
+/* Figures, captions and tables. Tables are booktabs rules, not boxes. */
+
+figure { margin: 2.75rem 0; }
+
+/* No surface of its own: a figure is ink on the same paper as the text. */
+figure img, figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+figcaption {
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin-top: 0.85rem;
+  max-width: 48rem;
+}
+figcaption p { margin: 0; text-indent: 0; }
+figcaption .label { color: var(--text); font-weight: 600; margin-right: 0.4ch; }
+
+.table-figure { overflow-x: auto; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+thead th {
+  border-bottom: 1px solid var(--rule-strong);
+  font-weight: 600;
+  text-align: left;
+}
+table tr:first-child th, table tr:first-child td {
+  border-top: 1px solid var(--rule-strong);
+}
+th, td { padding: 0.48rem 0.8rem; vertical-align: baseline; }
+th:first-child, td:first-child { padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+tbody tr { transition: background-color var(--dur-fast) var(--ease-out); }
+tbody tr:hover { background: var(--bg-sunk); }
+tbody tr:last-child td { border-bottom: 1px solid var(--rule-strong); }
+td strong { font-weight: 600; color: var(--accent); }
+td[align='right'], th[align='right'] { text-align: right; }

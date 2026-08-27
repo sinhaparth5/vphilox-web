@@ -1,0 +1,79 @@
+---
+title: 'The machine the placement results came off'
+description: 'Why a laptop carries two findings that four cloud instances could not.'
+order: 2
+---
+
+import CoreTopology from '../../components/CoreTopology.astro';
+import { withBase } from '@lib/url';
+
+Six hosts appear in <a href={withBase("paper#tab:machines")}>Table I</a>. Five of
+them carry throughput numbers. The sixth carries none, and carries instead the
+two results that need to know which physical core a thread is actually running
+on: the hyperthread penalty in
+<a href={withBase("paper#sec:placement")}>Section 7.3</a> and the
+instruction-cache control in
+<a href={withBase("paper#sec:icache")}>Section 7.4</a>.
+
+That host is a laptop. An Intel Core i5-11300H, four cores, eight threads,
+turbo disabled, running on bare metal.
+
+<CoreTopology />
+
+## Why not one of the cloud instances
+
+A guest kernel inside a hypervisor will tell you anything you want to hear. It
+publishes a sibling map that looks right. It accepts every affinity mask you
+hand it and reports success. Underneath, the hypervisor is scheduling virtual
+CPUs onto host cores on a policy of its own, so the mask pins a virtual
+identifier and nothing physical.
+
+The way we found out was a measurement that could not be true. Under WSL2, two
+workers on what the guest called one core's siblings ran *faster* than two
+workers on what it called separate cores: 0.63 cycles per byte against 0.63 to
+0.77, and stable where the other arm spread 20%. For a kernel that is bound on
+execution ports, real co-location cannot be free, let alone cheaper. The
+numbers were not measuring placement at all.
+
+So the placement study gates itself. Before it will report anything it
+measures the co-location penalty on the host it is running on, and if two
+workers on one core's siblings do not cost at least 15% more than two on
+separate cores, it refuses the run on the grounds that the affinity mask never
+moved anything. The Tiger Lake host cleared that gate at 35.6% to 40.6% across
+three invocations.
+
+## Why turbo is off
+
+The timestamp counter on this part ticks at the base clock, 3.1 GHz, and keeps
+ticking at that rate no matter what the core is doing. Leave boost on and the
+core runs at some other frequency that moves with temperature and with how
+many cores are busy, so a cycle count derived from the timestamp counter is
+counting something that is not core cycles, and the ceiling drifts during the
+run.
+
+Turning boost off makes the two coincide. The cost is that every absolute
+number from this machine is roughly 1.4&times; the same machine's boosted
+number, and comparable only against itself. Both studies here are ratios
+between two arms on the same host, so that is all they need.
+
+It is also why this machine's own throughput matrix is archived and quoted
+nowhere. Four cores running a full desktop cannot hold a 1% coefficient of
+variation across a whole sweep, and a number that cannot clear the bar does
+not go in a table.
+
+## What the counters had to prove
+
+The third column of <a href={withBase("paper#tab:icache")}>Table VII</a> is not
+a result. It is the check that the measurement was attached to the right
+threads.
+
+Instructions per byte is a property of the kernel. Placement cannot move it.
+If it reads identically in both arms, the counters were on the workers; if it
+moves, they were on something else. It reads 0.958554 in both arms, to six
+decimal places, at zero variation across fifteen repetitions.
+
+That check exists because the obvious instrumentation is wrong here. A
+benchmark framework that starts and stops counters on the thread running the
+benchmark loop would have counted the dispatcher, which spends the entire
+measurement blocked on a condition variable while the worker threads execute
+every instruction in the job.

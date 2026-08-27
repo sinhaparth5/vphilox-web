@@ -1,0 +1,71 @@
+/* Site header and footer. Both align to --shell so the page has one outer
+   edge rather than a header edge and a content edge. */
+
+header.site, footer.site {
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-size: var(--step--1);
+  font-variant-numeric: normal;
+}
+
+header.site {
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+header.site nav {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0.75rem var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wordmark {
+  font-weight: 700;
+  font-size: var(--step-0);
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* 44px tall targets, per touch guidance, without looking like buttons. */
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.65rem;
+  border-radius: 5px;
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+.nav-links a:hover { color: var(--text); background: var(--bg-sunk); }
+.nav-links a[aria-current='page'] { color: var(--text); font-weight: 600; }
+
+footer.site {
+  border-top: 1px solid var(--rule);
+  margin-top: 6rem;
+  color: var(--text-faint);
+}
+footer.site p {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 1.75rem var(--gutter);
+}
+footer.site a { color: var(--text-soft); text-decoration: none; }
+footer.site a:hover { color: var(--link); text-decoration: underline; }

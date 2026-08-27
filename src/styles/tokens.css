@@ -1,0 +1,44 @@
+/* Design tokens. Light only: the plots, the KaTeX glyphs and the diagrams are
+   all dark line art on paper, and a second palette bought nothing but a second
+   thing to keep in sync. */
+
+:root {
+  --text:        #16161a;
+  --text-soft:   #52525c;
+  --text-faint:  #7c7c86;
+  --bg:          #fbfbf9;
+  --bg-raised:   #ffffff;
+  --bg-sunk:     #f3f3ef;
+  --rule:        #e0e0d9;
+  /* One step firmer than --rule, for line art that has to hold its shape on
+     paper rather than against a white card. */
+  --rule-mid:    #cbcbc2;
+  --rule-strong: #16161a;
+  --link:        #0b5cad;
+  --accent:      #a3341f;
+  --focus:       #0b5cad;
+
+  /* 42rem at 18px lands around 70 characters, inside the 65-75 band. */
+  --measure: 42rem;
+  --breakout: 10rem;
+  /* Figures span measure + both breakouts; the header/footer match it so the
+     page has one outer edge rather than two. */
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --wide: calc(var(--measure) + var(--breakout) * 2);
+  --shell: calc(var(--wide) + var(--gutter) * 2);
+
+  --step--2: 0.8125rem;
+  --step--1: 0.9375rem;
+  --step-0:  1.125rem;
+  --step-1:  1.25rem;
+  --step-2:  1.5rem;
+  --step-3:  1.9375rem;
+  --step-4:  clamp(2.125rem, 1.2rem + 3.2vw, 3rem);
+
+  /* One motion vocabulary, so everything moves with the same rhythm. */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur:      260ms;
+  --dur-slow: 520ms;
+}

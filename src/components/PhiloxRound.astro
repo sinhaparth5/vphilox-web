@@ -1,0 +1,198 @@
+---
+// One round of Philox4x32-10, stepped. The permutation drawn here is the one
+// in Equations (2)-(4) of the paper:
+//   (h0,l0) = mulhilo(M0, c0),  (h1,l1) = mulhilo(M1, c2)
+//   c' = (h1 ^ c1 ^ k0,  l1,  h0 ^ c3 ^ k1,  l0)
+---
+
+<figure class="anim" data-philox>
+  <div class="anim-controls">
+    <button class="icon-btn" type="button" data-play aria-label="Play the sequence">
+      <svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <ol class="anim-steps" role="tablist" aria-label="Round stages">
+      <li><button type="button" role="tab" data-step="0">State</button></li>
+      <li><button type="button" role="tab" data-step="1">Multiply</button></li>
+      <li><button type="button" role="tab" data-step="2">XOR</button></li>
+      <li><button type="button" role="tab" data-step="3">Permute</button></li>
+      <li><button type="button" role="tab" data-step="4">Weyl</button></li>
+    </ol>
+  </div>
+  <div class="anim-progress"><span data-progress></span></div>
+
+  <div class="anim-canvas">
+  <svg viewBox="0 0 1120 690" role="img" aria-labelledby="pr-title pr-desc">
+    <title id="pr-title">One round of the Philox4x32-10 bijection</title>
+    <desc id="pr-desc">
+      Four 32-bit counter words. Two are multiplied by fixed constants into
+      64-bit products, each split into a high and a low half. The high halves are
+      XORed with an unmultiplied word and a key word. The four results are
+      written back in shuffled order, and the key is bumped by odd constants.
+    </desc>
+
+    <!-- stage 0: state -->
+    <g class="stage" data-step="0">
+      <g class="box" style="--i:0">
+        <rect x="20" y="48" width="180" height="52" rx="6"/>
+        <text x="110" y="80.46" font-size="19">c₀</text>
+      </g>
+      <g class="box" style="--i:1">
+        <rect x="240" y="48" width="180" height="52" rx="6"/>
+        <text x="330" y="80.46" font-size="19">c₁</text>
+      </g>
+      <g class="box" style="--i:2">
+        <rect x="460" y="48" width="180" height="52" rx="6"/>
+        <text x="550" y="80.46" font-size="19">c₂</text>
+      </g>
+      <g class="box" style="--i:3">
+        <rect x="680" y="48" width="180" height="52" rx="6"/>
+        <text x="770" y="80.46" font-size="19">c₃</text>
+      </g>
+      <g class="box key" style="--i:4">
+        <rect x="920" y="48" width="170" height="52" rx="6"/>
+        <text x="1005" y="80.46" font-size="19">k₀</text>
+      </g>
+      <g class="box key" style="--i:5">
+        <rect x="920" y="116" width="170" height="52" rx="6"/>
+        <text x="1005" y="148.46" font-size="19">k₁</text>
+      </g>
+      <text class="cap" x="110" y="30" font-size="14">counter</text>
+      <text class="cap" x="1005" y="30" font-size="14">key</text>
+    </g>
+
+    <!-- stage 1: multiply and split -->
+    <g class="stage" data-step="1">
+      <path class="wire" d="M110 100 V160"/>
+      <path class="wire" d="M110 224 V252 M62 252 H158 M62 252 V276 M158 252 V276"/>
+      <path class="wire" d="M550 100 V160"/>
+      <path class="wire" d="M550 224 V252 M502 252 H598 M502 252 V276 M598 252 V276"/>
+      <g class="op pill" style="--i:0">
+        <rect x="20" y="160" width="180" height="64" rx="30"/>
+        <text x="110" y="186" font-size="17">× M₀</text>
+      </g>
+      <g class="box hi" style="--i:2">
+        <rect x="20" y="276" width="84" height="48" rx="6"/>
+        <text x="62" y="305.78" font-size="17">h₀</text>
+      </g>
+      <g class="box lo" style="--i:3">
+        <rect x="116" y="276" width="84" height="48" rx="6"/>
+        <text x="158" y="305.78" font-size="17">l₀</text>
+      </g>
+      <g class="op pill" style="--i:1">
+        <rect x="460" y="160" width="180" height="64" rx="30"/>
+        <text x="550" y="186" font-size="17">× M₁</text>
+      </g>
+      <g class="box hi" style="--i:4">
+        <rect x="460" y="276" width="84" height="48" rx="6"/>
+        <text x="502" y="305.78" font-size="17">h₁</text>
+      </g>
+      <g class="box lo" style="--i:5">
+        <rect x="556" y="276" width="84" height="48" rx="6"/>
+        <text x="598" y="305.78" font-size="17">l₁</text>
+      </g>
+      <text class="hex" x="110" y="208" font-size="14">0xD2511F53</text>
+      <text class="hex" x="550" y="208" font-size="14">0xCD9E8D57</text>
+    </g>
+
+    <!-- stage 2: xor -->
+    <g class="stage" data-step="2">
+      <path class="wire" d="M502 324 V356 H90 V482"/>
+      <path class="wire" d="M62 324 V378 H530 V482"/>
+      <path class="wire ctx" d="M330 100 V400 H110 V482"/>
+      <path class="wire ctx" d="M770 100 V400 H550 V482"/>
+      <path class="wire ctx" d="M920 74 H880 V422 H130 V482"/>
+      <path class="wire ctx" d="M920 142 H902 V444 H570 V482"/>
+      <g class="op xor" style="--i:0">
+        <circle cx="110" cy="482" r="26"/>
+        <text x="110" y="488" font-size="17">⊕</text>
+      </g>
+      <g class="op xor" style="--i:1">
+        <circle cx="550" cy="482" r="26"/>
+        <text x="550" y="488" font-size="17">⊕</text>
+      </g>
+    </g>
+
+    <!-- stage 3: permute -->
+    <g class="stage" data-step="3">
+      <path class="wire out" d="M110 508 V588"/>
+      <path class="wire out" d="M550 508 V588"/>
+      <path class="wire out" d="M598 324 V536 H330 V588"/>
+      <path class="wire out" d="M158 324 V560 H770 V588"/>
+      <g class="box out" style="--i:0">
+        <rect x="20" y="588" width="180" height="52" rx="6"/>
+        <text x="110" y="620.46" font-size="19">c₀′</text>
+      </g>
+      <g class="box out" style="--i:1">
+        <rect x="240" y="588" width="180" height="52" rx="6"/>
+        <text x="330" y="620.46" font-size="19">c₁′</text>
+      </g>
+      <g class="box out" style="--i:2">
+        <rect x="460" y="588" width="180" height="52" rx="6"/>
+        <text x="550" y="620.46" font-size="19">c₂′</text>
+      </g>
+      <g class="box out" style="--i:3">
+        <rect x="680" y="588" width="180" height="52" rx="6"/>
+        <text x="770" y="620.46" font-size="19">c₃′</text>
+      </g>
+      <text class="cap" x="110" y="664" font-size="14">h₁ ⊕ c₁ ⊕ k₀</text>
+      <text class="cap" x="330" y="664" font-size="14">l₁</text>
+      <text class="cap" x="550" y="664" font-size="14">h₀ ⊕ c₃ ⊕ k₁</text>
+      <text class="cap" x="770" y="664" font-size="14">l₀</text>
+    </g>
+
+    <!-- stage 4: weyl -->
+    <g class="stage" data-step="4">
+      <path class="wire out" d="M1005 168 V200"/>
+      <g class="box weyl" style="--i:0">
+        <rect x="920" y="200" width="170" height="56" rx="6"/>
+        <text x="1005" y="224" font-size="15">k₀ += W₀</text>
+      </g>
+      <text class="pilllabel" x="1005" y="244" font-size="15">k₁ += W₁</text>
+      <text class="hex accent" x="1005" y="280" font-size="14">W₀ 0x9E3779B9</text>
+      <text class="hex accent" x="1005" y="298" font-size="14">W₁ 0xBB67AE85</text>
+    </g>
+  </svg>
+  </div>
+
+  <figcaption>
+    <span class="label" data-caption-label>State.</span>
+    <span data-caption-text></span>
+  </figcaption>
+</figure>
+
+<style>
+  /* Chrome, stage fading and wire tracing come from src/styles/anim.css.
+     What is left here is the vocabulary specific to this drawing. */
+
+  /* The natural width of the drawing; below it the canvas pans. */
+  svg { min-width: 820px; }
+
+  /* The figure has no card of its own, so the nodes carry the depth: a word
+     sits a shade above the paper, an operator a shade below it. */
+  .box rect { fill: var(--bg-raised); stroke: var(--rule-mid); stroke-width: 1.6; }
+  .box.hi rect { stroke: var(--accent); }
+  .box.key rect, .box.weyl rect { stroke-dasharray: 5 3; }
+  .stage.is-active .box.out rect { stroke: var(--accent); }
+
+  .op rect, .op circle { fill: var(--bg-sunk); stroke: var(--text); stroke-width: 1.6; }
+
+  /* Font sizes are set per element in the markup, so no rule here may set
+     font-size: a CSS declaration outranks an SVG presentation attribute. */
+  .hex { fill: var(--text-soft); text-anchor: middle; }
+  .hex.accent { fill: var(--accent); }
+</style>
+
+<script>
+  import { mountStepper, type Step } from '@lib/stepper';
+
+  const STEPS: Step[] = [
+    ['State', 'A 128-bit counter as four 32-bit words, plus a two-word key. Nothing carries over from the previous output. Only the counter advances, so any block can be computed without computing the ones before it.'],
+    ['Multiply', 'Two of the four words are multiplied by fixed constants. Each 32×32 product is 64 bits wide and both halves are kept. Scalar hardware hands you both for free. Vector instruction sets give you one or the other, which is why a round costs two instructions under SIMD and one on scalar.'],
+    ['XOR', 'Each high half is XORed with an unmultiplied word and one word of the key. The low halves pass through untouched. The key is what separates one stream from another, so two workers with different keys never collide.'],
+    ['Permute', 'The four results are written back shuffled, so the words multiplied this round are not the ones multiplied next round. Ten rounds of that is Philox4x32-10.'],
+    ['Weyl', 'Before the next round the key is bumped by two odd constants. Without it every round would use the same key, and the symmetry that creates is exactly what a statistical test finds.'],
+  ];
+
+  mountStepper('[data-philox]', STEPS);
+</script>

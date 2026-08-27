@@ -1,0 +1,11 @@
+/* Print. Drop the chrome and the interactive controls, keep the argument. */
+
+@media print {
+  header.site, footer.site, .skip, .anim-controls, .anim-progress { display: none; }
+  body { background: #fff; color: #000; font-size: 10pt; }
+  main { display: block; max-width: none; padding: 0; }
+  figure, .equation { break-inside: avoid; }
+  .reveal { opacity: 1; transform: none; }
+  .anim-canvas { overflow: visible; }
+  a { color: #000; text-decoration: none; }
+}

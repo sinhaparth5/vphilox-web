@@ -1,11 +1,86 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { withBase } from '@lib/url';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<Base title="vphilox">
+  <h1 class="hero">Portable, seekable random streams for parallel CPU simulation</h1>
+
+  <p class="lede">
+    <strong>vphilox</strong> is a header-only C++20 library built on Philox4x32-10, a
+    counter-based generator whose whole state is a key and a position. A checkpoint is
+    six 32-bit integers and a word offset. It survives a move between standard
+    libraries, instruction sets, and thread counts. <code>std::mt19937</code> survives
+    none of the three.
+  </p>
+
+  <p>
+    The objection to counter-based generators on CPUs has always been speed. An earlier
+    attempt to put Philox into a production machine-learning library was rejected on the
+    grounds that scalar Philox runs at one tenth the speed of the Mersenne Twister. That
+    tenfold penalty did not reproduce on any of the five processors measured here.
+    Interleaving independent counters across SIMD lanes puts the generator between
+    0.22&times; and 0.75&times; the cost per byte of <code>std::mt19937</code>, so on the
+    bulk path it is faster than the engine it replaces.
+  </p>
+
+  <nav class="cards">
+    <a class="card" href={withBase("paper")}>
+      <span class="card-kind">Paper</span>
+      <span class="card-title">Portable, Seekable Random Streams for Parallel CPU Simulation</span>
+      <span class="card-note">Full text, figures and tables &middot; also <em>PDF</em></span>
+    </a>
+    {docs.map((d) => (
+      <a class="card" href={withBase(`docs/${d.id}`)}>
+        <span class="card-kind">Explainer</span>
+        <span class="card-title">{d.data.title}</span>
+        <span class="card-note">{d.data.description}</span>
+      </a>
+    ))}
+  </nav>
+</Base>
+
+<style>
+  .hero {
+    font-size: var(--step-4);
+    line-height: 1.1;
+    margin: 0 0 1.25rem;
+  }
+  .lede { font-size: var(--step-1); }
+  .lede + p { text-indent: 0; margin-top: 0; }
+
+  .cards {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 3rem;
+  }
+  .card {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--bg-raised);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 120ms ease;
+  }
+  .card:hover { border-color: var(--link); }
+  .card-kind {
+    font-family: var(--font-head), system-ui, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .card-title {
+    font-family: var(--font-head), system-ui, sans-serif;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .card-note { font-size: var(--step--1); color: var(--text-soft); }
+</style>

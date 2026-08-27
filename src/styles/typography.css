@@ -1,0 +1,81 @@
+/* Headings, prose, links and code. Sans headings over serif text, with the
+   section numbers hung into the left breakout once there is room. */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.014em;
+  text-wrap: balance;
+  color: var(--text);
+  scroll-margin-top: 5rem;
+}
+
+h1 { font-size: var(--step-3); margin: 3.5rem 0 0.85rem; }
+h2 { font-size: var(--step-2); margin: 2.75rem 0 0.55rem; }
+h3 { font-size: var(--step-1); margin: 2.1rem 0 0.45rem; }
+h1:first-child, h2:first-child { margin-top: 0; }
+
+.secno {
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  margin-right: 0.6ch;
+}
+
+@media (min-width: 68rem) {
+  h1, h2, h3 { position: relative; }
+  h1 .secno, h2 .secno, h3 .secno {
+    position: absolute;
+    right: calc(100% + 0.9ch);
+    margin-right: 0;
+    white-space: nowrap;
+  }
+}
+
+p { margin: 0 0 1.15rem; }
+
+/* IEEE indents continuation paragraphs instead of spacing them. */
+p + p {
+  margin-top: -1.15rem;
+  text-indent: 1.4em;
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 0.06em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+a:hover { text-decoration-thickness: 0.11em; }
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.87em;
+  font-variant-numeric: normal;
+}
+
+:not(pre) > code {
+  background: var(--bg-sunk);
+  padding: 0.08em 0.34em;
+  border-radius: 4px;
+}
+
+/* Code is set into the page rather than boxed on top of it. */
+pre {
+  background: var(--bg-sunk);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1.2rem;
+  border-left: 2px solid var(--rule);
+  color: var(--text-soft);
+}
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }

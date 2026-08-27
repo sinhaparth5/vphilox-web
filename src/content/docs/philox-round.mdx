@@ -1,0 +1,45 @@
+---
+title: 'What one Philox round actually does'
+description: 'The bijection behind the generator, one step at a time.'
+order: 1
+---
+
+import PhiloxRound from '../../components/PhiloxRound.astro';
+import { withBase } from '@lib/url';
+
+A conventional generator holds internal state $s$ and computes
+$(s_{i+1}, x_i) = f(s_i)$. Getting the $n$th output means applying $f$ $n$ times,
+and the state you would have to checkpoint is whatever $f$ happens to keep in
+memory. For `std::mt19937` that is 624 words plus an index, in an order the C++
+standard never pinned down.
+
+Philox replaces the recurrence with a keyed bijection over a counter:
+
+$$
+x_n = b(\mathbf{c}_0 + n, \mathbf{k})
+$$
+
+Constant-time seek, independent substreams per worker, a checkpoint that
+survives a change of machine: every claim in the paper falls out of that one
+line, because there is no accumulated state left to disagree about. That leaves
+one thing to look at. $b$ itself.
+
+<PhiloxRound />
+
+Ten of those rounds is Philox4x32-10.
+
+The wide multiply is the whole cost. Each round does two
+$32 \times 32 \rightarrow 64$ multiplications and needs both halves of each
+product. Scalar code gets that for free, because the hardware produces a 64-bit
+result whether you asked for one or not. SIMD code does not: the vector
+instruction sets hand you the low halves or the high halves, never both, so a
+round costs two instructions where the scalar version costs one. That asymmetry
+is <a href={withBase("paper#sec:simd")}>why naive vectorization disappoints</a>,
+and working around it is most of what the library does.
+
+Nothing here depends on order. Round $r$ reads the output of round $r-1$ and a
+key derived from the seed, and nothing else. Ask for the block at counter
+$10^{12}$ and it costs what the block at counter $0$ costs: you add $10^{12}$
+to a 128-bit integer and run the ten rounds. That is why `discard` is
+$\mathcal{O}(1)$. It is also why two threads on disjoint counter ranges never
+have to talk to each other.

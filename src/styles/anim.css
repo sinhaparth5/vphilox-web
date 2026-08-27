@@ -1,0 +1,169 @@
+/* Shared chrome for the stepped diagrams: transport controls, step tabs,
+   progress rule, and the pan box the drawing lives in. Each diagram component
+   keeps only its own shapes in a scoped <style>; everything below is common to
+   all of them and lives here rather than being copied per component. */
+
+/* The figure sits directly on the page: no card, no border, no surface of its
+   own. Depth inside the drawing comes from the fills instead, which sit one
+   step either side of the paper. */
+.anim {
+  margin: 3rem 0;
+  padding: 0;
+}
+
+.anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-head), system-ui, sans-serif;
+}
+
+.icon-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+.icon-btn:hover { color: var(--text); background: var(--bg-sunk); }
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn .i-pause { display: none; }
+.anim.is-playing .icon-btn .i-play { display: none; }
+.anim.is-playing .icon-btn .i-pause { display: block; }
+
+.anim-steps {
+  display: flex;
+  flex: 1;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.anim-steps::-webkit-scrollbar { display: none; }
+
+.anim-steps button {
+  font: inherit;
+  font-size: 0.82rem;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  color: var(--text-soft);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+.anim-steps button:hover { color: var(--text); background: var(--bg-sunk); }
+.anim-steps button[aria-selected='true'] {
+  color: var(--text);
+  font-weight: 600;
+  background: var(--bg-sunk);
+}
+
+.anim-progress {
+  height: 2px;
+  margin: 0.7rem 0 0.9rem;
+  background: var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.anim-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--text-faint);
+  transform-origin: left;
+  transition: width var(--dur) var(--ease-out);
+}
+
+/* Below the drawing's own width the labels would scale into illegibility, so
+   it pans inside its box rather than shrinking with the viewport. */
+.anim-canvas {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin-inline: -0.25rem;
+  padding-inline: 0.25rem;
+}
+
+.anim-canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* Stages fade in as they are reached, then recede into context. */
+.anim .stage {
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease-out);
+}
+.anim .stage.is-on { opacity: 0.42; }
+.anim .stage.is-active { opacity: 1; }
+
+/* A stage marked `persist` is the substrate the later stages annotate rather
+   than a step that has been left behind, so it stays at full strength. */
+.anim .stage.persist.is-on { opacity: 1; }
+
+/* Each element in the active stage settles in with a short stagger. */
+.anim .stage .box,
+.anim .stage .op {
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transform-origin: center;
+  transition: opacity 300ms var(--ease-out), transform 380ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+.anim .stage.is-on .box, .anim .stage.is-on .op,
+.anim .stage.is-active .box, .anim .stage.is-active .op {
+  opacity: 1;
+  transform: none;
+}
+
+.anim .wire {
+  stroke: var(--text-faint);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+}
+.anim .wire.ctx { stroke: var(--rule-mid); stroke-dasharray: 4 4; }
+.anim .wire.out { stroke: var(--accent); stroke-width: 1.9; }
+
+/* Traced wires draw themselves; the dash length is measured in script. */
+.anim .wire.trace { stroke-dashoffset: var(--len, 0); }
+.anim .stage.is-on .wire.trace,
+.anim .stage.is-active .wire.trace {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 620ms var(--ease-in-out);
+}
+.anim .wire.ctx.trace { stroke-dasharray: none; }
+
+/* Every glyph is centred on its node; sizes are set per element in the markup. */
+.anim .box text, .anim .op text, .anim .pilllabel {
+  fill: var(--text);
+  text-anchor: middle;
+}
+.anim .cap { fill: var(--text-faint); text-anchor: middle; }
+
+.anim figcaption {
+  margin-top: 1rem;
+  min-height: 4.4em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim .stage,
+  .anim .stage .box,
+  .anim .stage .op,
+  .anim .wire.trace { transition: none; }
+}

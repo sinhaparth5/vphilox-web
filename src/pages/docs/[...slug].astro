@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from 'astro:content';
+import { withBase } from '@lib/url';
+import Base from '../../layouts/Base.astro';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+  return docs.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: docs[i - 1], next: docs[i + 1] },
+  }));
+};
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base title={`${entry.data.title} — vphilox`} description={entry.data.description}>
+  <h1 class="doc-title">{entry.data.title}</h1>
+  <Content />
+
+  <nav class="onward" aria-label="More explainers">
+    {prev ? (
+      <a class="step back" href={withBase(`docs/${prev.id}`)}>
+        <span class="dir">Previous</span>
+        <span class="what">{prev.data.title}</span>
+      </a>
+    ) : (
+      <a class="step back" href={withBase('docs')}>
+        <span class="dir">Up</span>
+        <span class="what">All explainers</span>
+      </a>
+    )}
+    {next ? (
+      <a class="step fwd" href={withBase(`docs/${next.id}`)}>
+        <span class="dir">Next</span>
+        <span class="what">{next.data.title}</span>
+      </a>
+    ) : (
+      <a class="step fwd" href={withBase('paper')}>
+        <span class="dir">Next</span>
+        <span class="what">The paper in full</span>
+      </a>
+    )}
+  </nav>
+</Base>
+
+<style>
+  .doc-title { font-size: var(--step-3); margin-bottom: 1.5rem; }
+
+  /* Every explainer ends somewhere, so each one names where to go next. */
+  .onward {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 4.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-head), system-ui, sans-serif;
+  }
+  @media (min-width: 40rem) {
+    .onward { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  }
+
+  .step {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem;
+    border-radius: 5px;
+    background: var(--bg-sunk);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .step:hover { background: color-mix(in srgb, var(--bg-sunk) 60%, var(--rule)); }
+  .step:hover .what { color: var(--link); }
+  .step.fwd { text-align: right; }
+
+  .dir {
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .what {
+    font-weight: 600;
+    line-height: 1.3;
+    text-wrap: balance;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+</style>

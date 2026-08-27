@@ -1,0 +1,17 @@
+/* The measure. A named-line grid: prose sits in `text`, figures break out to
+   `wide`, and anything full-bleed can claim `full`. */
+
+main {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] minmax(0, var(--breakout))
+    [text-start] min(var(--measure), 100% - var(--gutter) * 2)
+    [text-end] minmax(0, var(--breakout))
+    [wide-end] minmax(var(--gutter), 1fr)
+    [full-end];
+  padding-block: 4rem;
+}
+
+main > * { grid-column: text; }
+main > figure, main > .wide { grid-column: wide; }

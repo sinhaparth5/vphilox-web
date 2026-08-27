@@ -1,0 +1,55 @@
+/* Display equations, their hanging numbers, and the reference list they and
+   the body text link into. */
+
+.equation { position: relative; margin: 1.75rem 0; }
+.equation .katex-display { margin: 0; }
+.eqno {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-size: var(--step--1);
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.eq-anchor { position: absolute; top: -5rem; }
+
+.katex { font-size: 1.04em; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.35rem 0; }
+
+ol.references {
+  font-size: var(--step--1);
+  line-height: 1.55;
+  padding-left: 2.4rem;
+  counter-reset: ref;
+  list-style: none;
+}
+ol.references li {
+  counter-increment: ref;
+  position: relative;
+  margin-bottom: 0.85rem;
+  border-radius: 3px;
+  transition: background-color var(--dur-slow) var(--ease-out);
+}
+ol.references li::before {
+  content: '[' counter(ref) ']';
+  position: absolute;
+  left: -2.4rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+ol.references li p { margin: 0; text-indent: 0; }
+ol.references li:target {
+  background: color-mix(in srgb, var(--link) 14%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--link) 14%, transparent);
+}
+
+.footnotes {
+  font-size: var(--step--1);
+  color: var(--text-soft);
+  border-top: 1px solid var(--rule);
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
+}
+.footnotes p { text-indent: 0; }

@@ -1,0 +1,20 @@
+<figure id="alg:contract" class="algorithm">
+
+<div class="alg-body">
+
+**Input:** base counter $\mathbf{c}_0$, key $\mathbf{k}$, output pointer `out`, block count $B$
+
+**Output:** $4B$ unsigned 32-bit words written to `out`
+
+1. **for** $i \leftarrow 0$ **to** $B - 1$ **do**
+2. &nbsp;&nbsp;&nbsp;&nbsp;write $\mathrm{philox4x32}_{10}(\mathbf{c}_0 + i,\, \mathbf{k})$ to `out`$[4i \ldots 4i+3]$
+3. **end for**
+4. **return**
+
+</div>
+
+<figcaption>
+<span class="label">Algorithm 1.</span> Kernel contract, shared by all four backends.
+</figcaption>
+
+</figure>
