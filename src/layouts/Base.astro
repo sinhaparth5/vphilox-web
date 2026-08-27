@@ -1,18 +1,32 @@
 ---
 import { Font } from 'astro:assets';
 import { withBase } from '@lib/url';
+import { SITE, AUTHOR, absolute, canonical } from '@lib/seo';
 import '../styles/index.css';
 import 'katex/dist/katex.min.css';
 
 interface Props {
+  /** Page title, without the site name -- the layout appends it. */
   title: string;
   description?: string;
+  /** `article` for the paper and the explainers; `website` for the indexes. */
+  type?: 'website' | 'article';
+  /** Structured data for this page, emitted as one or more JSON-LD blocks. */
+  schema?: object | object[];
 }
 
 const {
   title,
-  description = 'vphilox: portable, seekable random streams for parallel CPU simulation.',
+  description = SITE.description,
+  type = 'website',
+  schema,
 } = Astro.props;
+
+// The home page is the site, so it does not get the name twice.
+const fullTitle = title === SITE.name ? `${SITE.name} — ${SITE.tagline}` : `${title} — ${SITE.name}`;
+const pageUrl = canonical(Astro.url.pathname);
+const ogImage = absolute(SITE.ogImage);
+const blocks = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 
 const here = Astro.url.pathname.replace(/\/$/, '');
 const isCurrent = (path: string) => {
@@ -26,14 +40,41 @@ const isCurrent = (path: string) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <link rel="icon" sizes="32x32" href={withBase('favicon.ico')} />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
     <meta name="color-scheme" content="light" />
-    <title>{title}</title>
+    <meta name="theme-color" content="#fbfbf9" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={AUTHOR.name} />
+    <link rel="canonical" href={pageUrl} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.tagline}`} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <Font cssVariable="--font-body" preload />
     <Font cssVariable="--font-head" preload />
     <Font cssVariable="--font-mono" />
+
+    {blocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} is:inline />
+    ))}
+    <slot name="head" />
   </head>
 
   <body>

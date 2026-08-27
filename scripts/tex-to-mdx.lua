@@ -335,6 +335,20 @@ function Pandoc(doc)
   end
   doc.blocks = started and body or doc.blocks
 
+  -- pandoc lifts \begin{abstract} into metadata, so it never reaches the body
+  -- and the landing page went out without one. It is the single most useful
+  -- block of text on that page for a search engine, so put it back at the top.
+  if doc.meta.abstract then
+    local intro = pandoc.Blocks({
+      pandoc.RawBlock('html', '<h2 class="abstract-head">Abstract</h2>'),
+      pandoc.RawBlock('html', '<div class="abstract">'),
+    })
+    intro:extend(pandoc.Blocks(doc.meta.abstract))
+    intro:insert(pandoc.RawBlock('html', '</div>'))
+    intro:extend(doc.blocks)
+    doc.blocks = intro
+  end
+
   collect(doc.blocks)
 
   local blocks = doc.blocks:walk({

@@ -3,6 +3,35 @@ title: 'Portable, Seekable Random Streams for Parallel CPU Simulation'
 author: 'Parth Sinha'
 ---
 
+<h2 class="abstract-head">Abstract</h2>
+
+<div class="abstract">
+
+A long simulation that checkpoints its random generator and resumes on a
+different machine is relying on a property that `std::mt19937` does not
+have. The C++ standard fixes the text format of an engine’s stream operators
+only partially, and the three major standard libraries disagree on both the
+numeric base of the digits and the order of the 624 state words. A checkpoint
+written under libstdc++ fails to load under the MSVC standard library, and
+loads without any diagnostic, at the wrong position, under libc++. This paper
+describes vphilox, a header-only C++20 library that removes the failure by
+changing what is stored. The generator is Philox4x32-10, a counter-based
+construction whose entire state is a key and a position, so a checkpoint is
+six 32-bit integers and a word offset, not a snapshot of engine
+internals. The same property gives constant-time seek and gives each worker an
+independent substream with no coordination, so results do not depend on thread
+count or scheduling. The cost of those properties is the question the design
+has to answer, because the earlier attempt to adopt Philox in a production
+machine-learning library was rejected on the grounds that scalar Philox runs at
+one tenth the speed of the Mersenne Twister. We report that the tenfold penalty
+did not reproduce on any of five processors measured, and that interleaving
+independent counters across SIMD lanes brings the generator to between
+$0.22\times$ and $0.75\times$ the cost per byte of `std::mt19937` on the
+bulk path. Aggregate cost per byte is flat across thread counts, and the first
+parallel limit we find is hyperthread co-location, not the generator.
+
+</div>
+
 <h1 id="sec:intro"><span class="secno">1</span> Introduction</h1>
 
 Consider a Monte Carlo simulation that runs for a week on a

@@ -1,13 +1,61 @@
 ---
 import { withBase } from '@lib/url';
+import { SITE, AUTHOR, PAPER, absolute } from '@lib/seo';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 
 const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
 
+const description =
+  'vphilox is a header-only C++20 library built on Philox4x32-10. A checkpoint is six ' +
+  '32-bit integers and a word offset, so a stream survives a move between standard ' +
+  'libraries, instruction sets and thread counts.';
+
+// Two entities on the home page: the site itself, and the library it documents.
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.name,
+    alternateName: SITE.tagline,
+    url: absolute(),
+    description,
+    inLanguage: 'en',
+    author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.orcid },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    name: SITE.name,
+    description,
+    url: absolute(),
+    codeRepository: SITE.repo,
+    programmingLanguage: 'C++',
+    runtimePlatform: 'C++20',
+    license: ['https://opensource.org/licenses/MIT', 'https://opensource.org/licenses/Apache-2.0'],
+    author: {
+      '@type': 'Person',
+      name: AUTHOR.name,
+      identifier: AUTHOR.orcid,
+      sameAs: AUTHOR.orcid,
+    },
+    keywords: [
+      'pseudorandom number generation',
+      'counter-based PRNG',
+      'Philox',
+      'SIMD',
+      'AVX2',
+      'AVX-512',
+      'ARM NEON',
+      'C++20',
+      'reproducibility',
+    ],
+    citation: { '@type': 'CreativeWork', name: PAPER.title, url: PAPER.doiUrl },
+  },
+];
 ---
 
-<Base title="vphilox">
+<Base title={SITE.name} description={description} schema={schema}>
   <h1 class="hero">Portable, seekable random streams for parallel CPU simulation</h1>
 
   <p class="lede">
@@ -62,14 +110,14 @@ const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.
     display: grid;
     gap: 0.2rem;
     padding: 1rem 1.1rem;
-    border: 1px solid var(--rule);
     border-radius: 5px;
-    background: var(--bg-raised);
+    background: var(--bg-sunk);
     text-decoration: none;
     color: inherit;
-    transition: border-color 120ms ease;
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
-  .card:hover { border-color: var(--link); }
+  .card:hover { background: color-mix(in srgb, var(--bg-sunk) 60%, var(--rule)); }
+  .card:hover .card-title { color: var(--link); }
   .card-kind {
     font-family: var(--font-head), system-ui, sans-serif;
     font-size: 0.72rem;
@@ -81,6 +129,7 @@ const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.
     font-family: var(--font-head), system-ui, sans-serif;
     font-weight: 600;
     line-height: 1.3;
+    transition: color var(--dur-fast) var(--ease-out);
   }
   .card-note { font-size: var(--step--1); color: var(--text-soft); }
 </style>

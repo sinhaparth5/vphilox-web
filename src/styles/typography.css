@@ -41,6 +41,25 @@ p + p {
   text-indent: 1.4em;
 }
 
+/* The paper's abstract. It leads the page, so it is set a step up from the body
+   and labelled rather than boxed -- like everything else here, it is ink on the
+   same paper, marked out by type and space instead of a border. */
+.abstract-head {
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 0.7rem;
+}
+.abstract {
+  font-size: var(--step-1);
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin-bottom: 3.25rem;
+}
+.abstract p { margin: 0; text-indent: 0; }
+.abstract + h1 { margin-top: 0; }
+
 a {
   color: var(--link);
   text-underline-offset: 0.16em;

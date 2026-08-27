@@ -1,13 +1,32 @@
 ---
 import { withBase } from '@lib/url';
+import { SITE, absolute } from '@lib/seo';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
 const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
 
+const description =
+  'Short illustrated pieces that take one mechanism from the vphilox paper -- the Philox ' +
+  'round, the machine behind the placement results -- and draw it step by step.';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Explainers',
+  description,
+  url: absolute('docs/'),
+  isPartOf: { '@type': 'WebSite', name: SITE.name, url: absolute() },
+  hasPart: docs.map((d) => ({
+    '@type': 'TechArticle',
+    headline: d.data.title,
+    description: d.data.description,
+    url: absolute(`docs/${d.id}/`),
+  })),
+};
 ---
 
-<Base title="Explainers — vphilox">
+<Base title="Explainers" description={description} schema={schema}>
   <h1>Explainers</h1>
   <p class="lede">Short pieces that take one mechanism from the paper and draw it.</p>
   <ul class="doc-list">

@@ -65,6 +65,32 @@ GitHub Pages at `https://sinhaparth5.github.io/vphilox-web`.
 - **Layout** is a named-line grid on `main`: content sits in the `text` column
   (`--measure`, 42rem), and `figure`/`.wide` break out to the `wide` column.
 
+## SEO and page metadata
+
+`src/lib/seo.ts` is the single source of truth for the site name, the origin, the
+author's ORCID, and the paper's DOI and publication date. Nothing else should
+hard-code them.
+
+- `Base.astro` emits the canonical link, Open Graph and Twitter tags, and any
+  JSON-LD passed in via its `schema` prop. Pages pass a **bare** `title` — the
+  layout appends `— vphilox` (the home page, whose title *is* the site name, gets
+  the tagline instead). Every page must pass its own `description`; the `SITE`
+  default is a fallback, not a plan.
+- `canonical()` appends a trailing slash to extensionless paths, because GitHub
+  Pages 301s `/paper` to `/paper/` — a canonical without it points at a redirect.
+  `@astrojs/sitemap` emits the same form, so the two agree. Structured-data URLs
+  use `absolute('paper/')` for the same reason.
+- The paper page carries **Google Scholar's Highwire Press tags** (`citation_*`)
+  in a `<Fragment slot="head">`. Scholar ignores schema.org and will not index a
+  page without a venue field, hence `citation_technical_report_institution`.
+- `./scripts/gen-og-image.sh` regenerates `public/og.png` (the 1200×630 social
+  card) and `public/apple-touch-icon.png`. It pulls the upstream TTFs at run time
+  because the self-hosted faces are woff2, which ImageMagick cannot read. The PNGs
+  are committed; the script is a once-in-a-while step.
+- **robots.txt cannot live here.** Crawlers only read it at the origin root, and
+  this is a project page — `/vphilox-web/robots.txt` is never fetched. It belongs
+  in the `sinhaparth5.github.io` user-site repo.
+
 ## The paper is generated, not written
 
 `src/content/paper/vphilox.mdx` is **generated output**. Edits to it are lost. Run:
@@ -81,14 +107,21 @@ argument if the source is somewhere other than `../vphilox/paper/vphilox.tex`.
 The pipeline is three parts, and a fix belongs in whichever one owns the problem:
 
 1. `scripts/pre-pass.sed` — rewrites `table*`/`figure*` to their single-column forms
-   (pandoc silently drops `\caption` and `\label` inside the starred versions) and
-   expands `\IEEEPARstart`.
+   (pandoc silently drops `\caption` and `\label` inside the starred versions),
+   expands `\IEEEPARstart`, and unwraps `\IEEEtitleabstractindextext{...}`, an
+   unknown macro whose whole argument pandoc discards — which silently took the
+   abstract with it.
 2. `scripts/tex-to-mdx.lua` — numbers sections/figures/tables/equations, rewrites
    `\cref` into "Section 3.2", turns `\cite` into links into the reference list, and
    rebuilds `thebibliography` (pandoc discards `\bibitem` keys, so the driver passes
    the key order in via `-M bibkeys=`).
 3. `src/content/paper/_algorithm.mdx.part` — the `algorithm2e` body, which pandoc drops
    entirely. The filter splices this file in.
+
+Once unwrapped, pandoc lifts the abstract into *metadata*, so it still never reaches
+the body. The filter re-inserts it at the top as `<div class="abstract">` — it is the
+most useful block of text on that page for a search engine, and the page shipped
+without it for a while.
 
 ### MDX constraints the filter has to respect
 

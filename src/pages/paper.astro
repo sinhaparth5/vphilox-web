@@ -1,5 +1,6 @@
 ---
 import { withBase } from '@lib/url';
+import { SITE, AUTHOR, PAPER, absolute } from '@lib/seo';
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 
@@ -7,9 +8,75 @@ const entry = await getEntry('paper', 'vphilox');
 if (!entry) throw new Error('paper/vphilox.mdx missing — run scripts/convert-paper.sh');
 const { Content } = await render(entry);
 
+const description =
+  'std::mt19937 checkpoints do not survive a change of standard library. vphilox stores ' +
+  'a key and a position instead, and costs 0.22-0.75x per byte on the bulk path.';
+
+const keywords = [
+  'random number generation',
+  'counter-based generators',
+  'Philox',
+  'SIMD',
+  'AVX-512',
+  'ARM NEON',
+  'reproducibility',
+  'checkpoint and restart',
+  'parallel simulation',
+  'C++',
+];
+
+// Trailing slash: the canonical form GitHub Pages actually serves.
+const pageUrl = absolute('paper/');
+const pdfUrl = absolute(PAPER.pdf);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ScholarlyArticle',
+  headline: PAPER.title,
+  name: PAPER.title,
+  abstract: description,
+  datePublished: PAPER.published,
+  inLanguage: 'en',
+  isAccessibleForFree: true,
+  url: pageUrl,
+  mainEntityOfPage: pageUrl,
+  identifier: [
+    { '@type': 'PropertyValue', propertyID: 'DOI', value: PAPER.doi },
+  ],
+  sameAs: PAPER.doiUrl,
+  license: PAPER.license,
+  keywords,
+  encoding: { '@type': 'MediaObject', encodingFormat: 'application/pdf', contentUrl: pdfUrl },
+  author: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    identifier: AUTHOR.orcid,
+    sameAs: AUTHOR.orcid,
+    affiliation: { '@type': 'Organization', name: AUTHOR.affiliation },
+  },
+  publisher: { '@type': 'Organization', name: 'Zenodo' },
+  about: { '@type': 'SoftwareSourceCode', name: SITE.name, codeRepository: SITE.repo },
+};
 ---
 
-<Base title={entry.data.title}>
+<Base title={entry.data.title} description={description} type="article" schema={schema}>
+  {/* Google Scholar reads Highwire Press tags, not schema.org, and will not
+      index the page at all without a venue field -- hence the report tag. */}
+  <Fragment slot="head">
+    <meta name="citation_title" content={PAPER.title} />
+    <meta name="citation_author" content={AUTHOR.name} />
+    <meta name="citation_author_institution" content={AUTHOR.affiliation} />
+    <meta name="citation_author_orcid" content={AUTHOR.orcid} />
+    <meta name="citation_publication_date" content={PAPER.published.replace(/-/g, '/')} />
+    <meta name="citation_online_date" content={PAPER.published.replace(/-/g, '/')} />
+    <meta name="citation_technical_report_institution" content="Zenodo" />
+    <meta name="citation_doi" content={PAPER.doi} />
+    <meta name="citation_abstract_html_url" content={pageUrl} />
+    <meta name="citation_pdf_url" content={pdfUrl} />
+    <meta name="citation_language" content="en" />
+    <meta name="citation_keywords" content={keywords.join('; ')} />
+  </Fragment>
+
   <header class="paper-head">
     <h1 class="paper-title">{entry.data.title}</h1>
     <p class="byline">{entry.data.author}</p>
