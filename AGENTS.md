@@ -144,7 +144,8 @@ copied into `src/content/paper/` so Astro's asset pipeline resolves them; the fi
 rewrites `.pdf` sources to `./name.svg`.
 
 Animated explanatory SVGs are Astro components in `src/components/`, used from
-`src/content/docs/*.mdx`. They share two things and differ only in the drawing:
+`src/content/docs/*.mdx` and, for `LaneInterleave.astro`, from the home page.
+They share two things and differ only in the drawing:
 
 - `src/styles/anim.css` — the figure chrome (transport controls, step tabs, progress
   rule, pan box) and the stage/wire animation vocabulary. The chrome is borderless and
@@ -157,6 +158,14 @@ Animated explanatory SVGs are Astro components in `src/components/`, used from
   `getTotalLength()` so the dash animation matches the real path length, and starts
   the figure once it scrolls into view. `opts.onRender` covers state a stage class
   cannot carry, such as which of two mutually exclusive placements is on screen.
+
+`LaneInterleave.astro` is the home page's opening argument, and it is drawn on one
+shared time axis: the ten round gates sit at the same `x` in both bands, so the
+scalar pass and the eight-lane pass are directly comparable and the picture makes
+the claim before the prose does. A gate is drawn open (`fill: none`) rather than
+filled, because the lane has to stay visible running through it; only the things
+that hold a value are filled. Numbers in it come from Table 1 and the `generate_n`
+row of Table 6.
 
 Two constraints the drawings have to respect:
 

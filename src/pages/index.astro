@@ -3,6 +3,7 @@ import { withBase } from '@lib/url';
 import { SITE, AUTHOR, PAPER, absolute } from '@lib/seo';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import LaneInterleave from '../components/LaneInterleave.astro';
 
 const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
 
@@ -66,14 +67,59 @@ const schema = [
     none of the three.
   </p>
 
+  <LaneInterleave />
+
+  <h2>The objection was always speed</h2>
+
   <p>
-    The objection to counter-based generators on CPUs has always been speed. An earlier
-    attempt to put Philox into a production machine-learning library was rejected on the
-    grounds that scalar Philox runs at one tenth the speed of the Mersenne Twister. That
-    tenfold penalty did not reproduce on any of the five processors measured here.
-    Interleaving independent counters across SIMD lanes puts the generator between
-    0.22&times; and 0.75&times; the cost per byte of <code>std::mt19937</code>, so on the
-    bulk path it is faster than the engine it replaces.
+    An earlier attempt to put Philox into a production machine-learning library was
+    rejected on the grounds that scalar Philox runs at one tenth the speed of the
+    Mersenne Twister. That tenfold penalty did not reproduce on any of the five
+    processors measured here. Interleaving independent counters across SIMD lanes puts
+    the generator between 0.22&times; and 0.75&times; the cost per byte of
+    <code>std::mt19937</code>, so on the bulk path it is faster than the engine it
+    replaces. Aggregate cost per byte is flat across thread counts, and the first
+    parallel limit the paper finds is hyperthread co-location, not the generator.
+  </p>
+
+  <dl class="stats">
+    <div>
+      <dt>0.22–0.75&times;</dt>
+      <dd>cost per byte against <code>std::mt19937</code>, bulk path, five processors</dd>
+    </div>
+    <div>
+      <dt>7 integers</dt>
+      <dd>the entire serialized state, version tag aside</dd>
+    </div>
+    <div>
+      <dt>O(1)</dt>
+      <dd><code>discard(N)</code> costs the same for <em>N</em> = 1 and <em>N</em> = 2<sup>40</sup></dd>
+    </div>
+  </dl>
+
+  <h2>What actually gets written</h2>
+
+  <p>
+    The C++ standard fixes the text format of an engine&rsquo;s stream operators only
+    partially, and the three major standard libraries disagree. libstdc++ writes the 624
+    state words of <code>std::mt19937</code> in raw internal order followed by a position
+    index; libc++ and the Microsoft standard library write the same words rotated into
+    canonical order and write no position at all. The word counts agree, which is what
+    makes the failure dangerous: a reader handed 624 integers cannot tell that they are
+    in the wrong order, so the restore succeeds, at a position nobody chose, without a
+    diagnostic.
+  </p>
+
+  <p>vphilox writes a position instead.</p>
+
+  <pre><code>vphilox1 &lt;k0&gt; &lt;k1&gt; &lt;c0&gt; &lt;c1&gt; &lt;c2&gt; &lt;c3&gt; &lt;word&gt;</code></pre>
+
+  <p class="note">
+    Seven decimal integers and a version tag. Nothing about the engine&rsquo;s refill
+    buffer is in there, which is why states written before the AVX-512 kernel raised the
+    refill size from 8 blocks to 16 still load after it. Digits are formatted and parsed
+    by hand, so an imbued grouping locale cannot corrupt a checkpoint, and unrecognised
+    input is refused rather than interpreted.
   </p>
 
   <nav class="cards">
@@ -99,12 +145,46 @@ const schema = [
     margin: 0 0 1.25rem;
   }
   .lede { font-size: var(--step-1); }
-  .lede + p { text-indent: 0; margin-top: 0; }
+
+  /* The figure is the page's opening argument, so it gets more air than the
+     2.75rem a figure carries in running text. */
+  .lede + :global(.anim) { margin: 2.5rem 0 3.5rem; }
+
+  /* Marked out by rules and type, not boxed: the same treatment the tables in
+     the paper get. The numbers are the one place colour is spent on the page. */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1.5rem 2rem;
+    margin: 2.5rem 0;
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--rule-strong);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+  .stats div { display: grid; gap: 0.3rem; align-content: start; }
+  .stats dt {
+    font-family: var(--font-head), system-ui, sans-serif;
+    font-size: var(--step-2);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  .stats dd {
+    margin: 0;
+    font-family: var(--font-head), system-ui, sans-serif;
+    font-size: var(--step--1);
+    line-height: 1.45;
+    color: var(--text-soft);
+  }
+
+  /* Follows a code block rather than a paragraph, so it takes no indent. */
+  .note { text-indent: 0; margin-top: 1.15rem; }
 
   .cards {
     display: grid;
     gap: 0.75rem;
-    margin-top: 3rem;
+    margin-top: 3.5rem;
   }
   .card {
     display: grid;
@@ -123,7 +203,7 @@ const schema = [
     font-size: 0.72rem;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: var(--text-faint);
+    color: var(--accent);
   }
   .card-title {
     font-family: var(--font-head), system-ui, sans-serif;

@@ -1,0 +1,203 @@
+---
+// Why counter interleaving works, stepped. The claim drawn here is Section 4
+// of the paper: ten rounds are a serial chain, so wall time is set by the
+// length of the chain and not by how many independent counters ride it.
+// Widths are Table 1; the cost bar is the generate_n row of Table 6.
+---
+
+<figure class="anim" data-lanes>
+  <div class="anim-controls">
+    <button class="icon-btn" type="button" data-play aria-label="Play the sequence">
+      <svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <ol class="anim-steps" role="tablist" aria-label="Interleaving stages">
+      <li><button type="button" role="tab" data-step="0">One at a time</button></li>
+      <li><button type="button" role="tab" data-step="1">Eight counters</button></li>
+      <li><button type="button" role="tab" data-step="2">Same ten rounds</button></li>
+      <li><button type="button" role="tab" data-step="3">The multiply</button></li>
+      <li><button type="button" role="tab" data-step="4">The cost</button></li>
+    </ol>
+  </div>
+  <div class="anim-progress"><span data-progress></span></div>
+
+  <div class="anim-canvas">
+  <svg viewBox="0 0 1120 640" role="img" aria-labelledby="li-title li-desc">
+    <title id="li-title">Counter interleaving across SIMD lanes</title>
+    <desc id="li-desc">
+      Two passes drawn on the same time axis. The first carries a single counter
+      through ten rounds of Philox and writes one 128-bit block. The second
+      loads eight consecutive counters into the eight lanes of one 256-bit
+      register and carries all of them through the same ten rounds, writing
+      eight blocks in the same span. A bar chart below compares cost per byte
+      against std::mt19937: one times the baseline against a measured range of
+      0.22 to 0.75.
+    </desc>
+
+    <!-- stage 0: the serial chain, one counter -->
+    <g class="stage persist" data-step="0">
+      <text class="bandlab" x="16" y="32" font-size="14">scalar · one counter per pass</text>
+      <text class="cap" x="220" y="60" font-size="14">r₁</text>
+      <text class="cap" x="292" y="60" font-size="14">r₂</text>
+      <text class="cap" x="364" y="60" font-size="14">r₃</text>
+      <text class="cap" x="436" y="60" font-size="14">r₄</text>
+      <text class="cap" x="508" y="60" font-size="14">r₅</text>
+      <text class="cap" x="580" y="60" font-size="14">r₆</text>
+      <text class="cap" x="652" y="60" font-size="14">r₇</text>
+      <text class="cap" x="724" y="60" font-size="14">r₈</text>
+      <text class="cap" x="796" y="60" font-size="14">r₉</text>
+      <text class="cap" x="868" y="60" font-size="14">r₁₀</text>
+
+      <path class="wire trace" d="M150 92 H940"/>
+
+      <g class="box" style="--i:0">
+        <rect x="16" y="70" width="134" height="44" rx="6"/>
+        <text x="83" y="97" font-size="15">c₀+0</text>
+      </g>
+
+      <g class="box round" style="--i:1"><rect x="190" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:2"><rect x="262" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:3"><rect x="334" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:4"><rect x="406" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:5"><rect x="478" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:6"><rect x="550" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:7"><rect x="622" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:8"><rect x="694" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:9"><rect x="766" y="70" width="60" height="44" rx="6"/></g>
+      <g class="box round" style="--i:10"><rect x="838" y="70" width="60" height="44" rx="6"/></g>
+
+      <g class="box out" style="--i:11">
+        <rect x="940" y="70" width="164" height="44" rx="6"/>
+        <text x="1022" y="97" font-size="15">16 B</text>
+      </g>
+    </g>
+
+    <!-- stage 1: eight independent counters in one register -->
+    <g class="stage persist" data-step="1">
+      <text class="bandlab" x="16" y="188" font-size="14">AVX2 · eight counters per __m256i</text>
+
+      <rect class="reg" x="8" y="202" width="150" height="244" rx="8"/>
+      <g class="box lane" style="--i:0"><rect x="16" y="214" width="134" height="24" rx="4"/><text x="83" y="231" font-size="14">c₀+0</text></g>
+      <g class="box lane" style="--i:1"><rect x="16" y="242" width="134" height="24" rx="4"/><text x="83" y="259" font-size="14">c₀+1</text></g>
+      <g class="box lane" style="--i:2"><rect x="16" y="270" width="134" height="24" rx="4"/><text x="83" y="287" font-size="14">c₀+2</text></g>
+      <g class="box lane" style="--i:3"><rect x="16" y="298" width="134" height="24" rx="4"/><text x="83" y="315" font-size="14">c₀+3</text></g>
+      <g class="box lane" style="--i:4"><rect x="16" y="326" width="134" height="24" rx="4"/><text x="83" y="343" font-size="14">c₀+4</text></g>
+      <g class="box lane" style="--i:5"><rect x="16" y="354" width="134" height="24" rx="4"/><text x="83" y="371" font-size="14">c₀+5</text></g>
+      <g class="box lane" style="--i:6"><rect x="16" y="382" width="134" height="24" rx="4"/><text x="83" y="399" font-size="14">c₀+6</text></g>
+      <g class="box lane" style="--i:7"><rect x="16" y="410" width="134" height="24" rx="4"/><text x="83" y="427" font-size="14">c₀+7</text></g>
+    </g>
+
+    <!-- stage 2: the same ten rounds, eight lanes wide -->
+    <g class="stage persist" data-step="2">
+      <g class="box col" style="--i:0"><rect x="190" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:1"><rect x="262" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:2"><rect x="334" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:3"><rect x="406" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:4"><rect x="478" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:5"><rect x="550" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:6"><rect x="622" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:7"><rect x="694" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:8"><rect x="766" y="210" width="60" height="228" rx="6"/></g>
+      <g class="box col" style="--i:9"><rect x="838" y="210" width="60" height="228" rx="6"/></g>
+
+      <path class="wire lane trace" d="M150 226 H940"/>
+      <path class="wire lane trace" d="M150 254 H940"/>
+      <path class="wire lane trace" d="M150 282 H940"/>
+      <path class="wire lane trace" d="M150 310 H940"/>
+      <path class="wire lane trace" d="M150 338 H940"/>
+      <path class="wire lane trace" d="M150 366 H940"/>
+      <path class="wire lane trace" d="M150 394 H940"/>
+      <path class="wire lane trace" d="M150 422 H940"/>
+
+      <rect class="reg" x="932" y="202" width="180" height="244" rx="8"/>
+      <g class="box lane out" style="--i:0"><rect x="940" y="214" width="164" height="24" rx="4"/><text x="1022" y="231" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:1"><rect x="940" y="242" width="164" height="24" rx="4"/><text x="1022" y="259" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:2"><rect x="940" y="270" width="164" height="24" rx="4"/><text x="1022" y="287" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:3"><rect x="940" y="298" width="164" height="24" rx="4"/><text x="1022" y="315" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:4"><rect x="940" y="326" width="164" height="24" rx="4"/><text x="1022" y="343" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:5"><rect x="940" y="354" width="164" height="24" rx="4"/><text x="1022" y="371" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:6"><rect x="940" y="382" width="164" height="24" rx="4"/><text x="1022" y="399" font-size="14">16 B</text></g>
+      <g class="box lane out" style="--i:7"><rect x="940" y="410" width="164" height="24" rx="4"/><text x="1022" y="427" font-size="14">16 B</text></g>
+      <text class="total" x="1022" y="468" font-size="14">8 × 16 B = 128 B</text>
+    </g>
+
+    <!-- stage 3: what a round costs under SIMD -->
+    <g class="stage" data-step="3">
+      <g class="overlay"><rect x="478" y="210" width="60" height="228" rx="6"/></g>
+      <text class="bandnote" x="190" y="468" font-size="14">no 32-lane widening multiply: each round pays two, even lanes then odd</text>
+    </g>
+
+    <!-- stage 4: what it measures -->
+    <g class="stage" data-step="4">
+      <text class="bandlab" x="16" y="500" font-size="14">cost per byte, relative to std::mt19937</text>
+
+      <text class="rowlab" x="176" y="536" font-size="14">std::mt19937</text>
+      <g class="bar" style="--i:0"><rect x="190" y="518" width="600" height="26" rx="3"/></g>
+      <text class="val" x="802" y="536" font-size="14">1.00×</text>
+
+      <text class="rowlab" x="176" y="578" font-size="14">vphilox</text>
+      <rect class="track" x="190" y="560" width="600" height="26" rx="3"/>
+      <g class="bar bar-hi" style="--i:1"><rect x="322" y="560" width="318" height="26" rx="3"/></g>
+      <text class="val" x="652" y="578" font-size="14">0.22 – 0.75×</text>
+
+      <text class="bandnote" x="190" y="616" font-size="14">five processors · the tenfold penalty reproduced on none of them</text>
+    </g>
+  </svg>
+  </div>
+
+  <figcaption>
+    <span class="label" data-caption-label>One at a time.</span>
+    <span data-caption-text></span>
+  </figcaption>
+</figure>
+
+<style>
+  /* Chrome, stage fading and wire tracing come from src/styles/anim.css.
+     What is left here is the vocabulary specific to this drawing. */
+
+  /* The natural width of the drawing; below it the canvas pans. */
+  svg { min-width: 900px; }
+
+  /* No card, so the fills carry the depth. A shape that holds a value sits a
+     step above the paper; the registers those values are read out of, and the
+     track the measured range sits in, are substrate a step under it. */
+  .box rect { fill: var(--bg-raised); stroke: var(--rule-mid); stroke-width: 1.6; }
+  .reg, .track { fill: var(--bg-sunk); }
+  /* A round is a gate the lane passes through rather than a container, so it
+     is drawn open and the wire stays visible inside it. */
+  .box.round rect, .box.col rect { fill: none; }
+  .stage.is-active .box.out rect { stroke: var(--accent); }
+
+  /* One chromatic statement: the interleaved path and what it measures. */
+  .wire.lane { stroke: var(--accent); stroke-width: 1.7; }
+  .bar rect { fill: var(--text-faint); }
+  .bar.bar-hi rect { fill: var(--accent); }
+
+  /* The multiply callout is an aside about the interleaved path, so it is
+     marked in the other colour rather than competing with the lanes. */
+  .overlay rect { fill: none; stroke: var(--link); stroke-width: 2.4; }
+
+  /* Font sizes are set per element in the markup, so no rule here may set
+     font-size: a CSS declaration outranks an SVG presentation attribute. The
+     same applies to text-anchor, hence a class per anchoring rather than .cap. */
+  .bandlab, .bandnote, .val { text-anchor: start; }
+  .bandlab { fill: var(--text-soft); }
+  .bandnote { fill: var(--text-faint); }
+  .rowlab { fill: var(--text-faint); text-anchor: end; }
+  .total { fill: var(--text-soft); text-anchor: middle; }
+  .val { fill: var(--text); font-variant-numeric: tabular-nums; }
+</style>
+
+<script>
+  import { mountStepper, type Step } from '@lib/stepper';
+
+  const STEPS: Step[] = [
+    ['One at a time', 'Philox4x32-10 is ten rounds, and each one consumes the round before it. A scalar pass walks a single counter down that chain and writes one 128-bit block at the end. The chain is serial, so the multiplies issue faster than their latency retires them and the pipeline drains between rounds. This is the shape behind the generator’s reputation for being ten times slower than the Mersenne Twister.'],
+    ['Eight counters', 'Block n is b(c₀ + n, k). It depends on its own index and on nothing else, so eight consecutive blocks have no dependency on one another at all. Load their counters into the eight 32-bit lanes of one __m256i and there are eight independent chains sitting side by side, waiting on the same latency.'],
+    ['Same ten rounds', 'The ten rounds now run once, across every lane. Wall time is set by the length of the chain rather than by how many counters ride it, so the pass that produced 16 bytes produces 128. AVX-512 applies the same reasoning at sixteen counters per register; NEON carries two four-lane groups and alternates their rounds, which fills the multiply latency the same way and runs 1.504× the single-group kernel.'],
+    ['The multiply', 'It is not free. No vector instruction set offers a 32-lane widening multiply that keeps both halves of the product in place, so each round pays two: one on the even lanes, one on the odd, then a repack. Filling all eight lanes spreads that cost over twice as many counters, and measured 21.1% faster than the four-counter layout on a Core i5-11300H.'],
+    ['The cost', 'On the bulk path the generator costs between 0.22× and 0.75× per byte of std::mt19937 across five processors, so on that path it is faster than the engine it replaces. The tenfold penalty reproduced on none of them: without specialised wide multiplies the range is 1.10× to 1.65×, and the objection is removed twice over.'],
+  ];
+
+  mountStepper('[data-lanes]', STEPS, { autoplayMs: 3400 });
+</script>
